@@ -1,0 +1,29 @@
+-- Create the new tables with the same schema as the original tables
+CREATE TABLE table1_new (
+    id INT PRIMARY KEY,
+    name VARCHAR(255)
+);
+
+CREATE TABLE table2_new (
+    id INT PRIMARY KEY,
+    table1_id INT,
+    value VARCHAR(255),
+    FOREIGN KEY (table1_id) REFERENCES table1_new(id)
+);
+
+-- Copy the data from the old tables into the new tables
+INSERT INTO table1_new (id, name)
+SELECT id, name FROM table1;
+
+INSERT INTO table2_new (id, table1_id, value)
+SELECT t2.id, t1_new.id, t2.value
+FROM table2 t2
+JOIN table1_new t1_new ON t2.table1_id = t1_new.id;
+
+-- Drop the old tables
+DROP TABLE table1;
+DROP TABLE table2;
+
+-- Rename the new tables to the old table names
+ALTER TABLE table1_new RENAME TO table1;
+ALTER TABLE table2_new RENAME TO table2;
